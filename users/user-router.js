@@ -3,9 +3,10 @@ const express = require('express');
 const db = require('../data/db-config.js');
 
 const router = express.Router();
+const Users = require('./model.js');
 
 router.get('/', (req, res) => {
-  db('users')
+  Users.list()
   .then(users => {
     res.json(users);
   })
@@ -17,9 +18,10 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  db('users').where({ id })
-  .then(users => {
-    const user = users[0];
+  Users.listById(id)
+  .then(user => {
+    // console.log('users', users);
+    // const user = users[0];
 
     if (user) {
       res.json(user);
@@ -35,9 +37,10 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const userData = req.body;
 
+  Users.insert(userData);
   db('users').insert(userData)
   .then(ids => {
-    res.status(201).json({ created: ids[0] });
+    res.status(201).json({ created: ids });
   })
   .catch(err => {
     res.status(500).json({ message: 'Failed to create new user' });
